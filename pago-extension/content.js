@@ -10,15 +10,15 @@
   const GOVERNANCE_HINT_ID = 'pago-governance-hint';
 
   const STAGE_NODE_MAP = {
-    'Revisão Acadêmica': 'Task_Academic',
+    'RevisÃ£o AcadÃªmica': 'Task_Academic',
     'Check de Biblioteca': 'Task_Library',
-    'Emissão Autorizada': 'Task_Final',
+    'EmissÃ£o Autorizada': 'Task_Final',
   };
 
   const HIGHLIGHT_CLASS_MAP = {
-    'Revisão Acadêmica': 'pago-marker-blue',
+    'RevisÃ£o AcadÃªmica': 'pago-marker-blue',
     'Check de Biblioteca': 'pago-marker-blue',
-    'Emissão Autorizada': 'pago-marker-green',
+    'EmissÃ£o Autorizada': 'pago-marker-green',
   };
 
   const BPMN_XML = `<?xml version="1.0" encoding="UTF-8"?>
@@ -29,10 +29,10 @@
   id="Definitions_PAGO"
   targetNamespace="http://pago.local/bpmn">
   <bpmn:process id="Process_Diploma" isExecutable="false">
-    <bpmn:startEvent id="StartEvent_Begin" name="Início">
+    <bpmn:startEvent id="StartEvent_Begin" name="InÃ­cio">
       <bpmn:outgoing>Flow_1</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:task id="Task_Academic" name="Revisão Acadêmica">
+    <bpmn:task id="Task_Academic" name="RevisÃ£o AcadÃªmica">
       <bpmn:incoming>Flow_1</bpmn:incoming>
       <bpmn:outgoing>Flow_2</bpmn:outgoing>
     </bpmn:task>
@@ -40,7 +40,7 @@
       <bpmn:incoming>Flow_2</bpmn:incoming>
       <bpmn:outgoing>Flow_3</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:task id="Task_Final" name="Emissão Autorizada">
+    <bpmn:task id="Task_Final" name="EmissÃ£o Autorizada">
       <bpmn:incoming>Flow_3</bpmn:incoming>
     </bpmn:task>
     <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_Begin" targetRef="Task_Academic" />
@@ -174,7 +174,7 @@
         <div id="pago-panel" class="pago-panel" aria-label="Mapa de processo PAGO">
           <div class="pago-panel-header">
             <strong>PAGO ? GPS de Processo</strong>
-            <span id="pago-current-stage" class="pago-stage">Revisão Acadêmica</span>
+            <span id="pago-current-stage" class="pago-stage">RevisÃ£o AcadÃªmica</span>
           </div>
           <div id="pago-bpmn-container" class="pago-bpmn-container"></div>
         </div>
@@ -214,9 +214,9 @@
           resolve(window.BpmnJS);
           return;
         }
-        reject(new Error('bpmn-js indisponível após o carregamento'));
+        reject(new Error('bpmn-js indisponÃ­vel apÃ³s o carregamento'));
       });
-      script.addEventListener('error', () => reject(new Error('Não foi possível baixar bpmn-js via CDN')));
+      script.addEventListener('error', () => reject(new Error('NÃ£o foi possÃ­vel baixar bpmn-js via CDN')));
       document.documentElement.appendChild(script);
     });
   }
@@ -269,7 +269,7 @@
     if (!hint) {
       hint = document.createElement('div');
       hint.id = GOVERNANCE_HINT_ID;
-      hint.textContent = 'Bloqueado pelo PAGO: Pendências detectadas';
+      hint.textContent = 'Bloqueado pelo PAGO: PendÃªncias detectadas';
       hint.style.marginTop = '8px';
       hint.style.padding = '8px 10px';
       hint.style.borderRadius = '10px';
@@ -290,7 +290,7 @@
       return;
     }
 
-    const isAuthorized = statusText === 'Emissão Autorizada';
+    const isAuthorized = statusText === 'EmissÃ£o Autorizada';
     const hint = ensureGovernanceMessage(actionButton);
 
     if (isAuthorized) {
@@ -305,7 +305,7 @@
     actionButton.style.pointerEvents = 'none';
     actionButton.style.opacity = '0.5';
     actionButton.setAttribute('aria-disabled', 'true');
-    actionButton.title = 'Ação bloqueada pelo PAGO: fluxo ainda não autorizado.';
+    actionButton.title = 'AÃ§Ã£o bloqueada pelo PAGO: fluxo ainda nÃ£o autorizado.';
     hint.style.display = 'block';
   }
 

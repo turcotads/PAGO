@@ -1,78 +1,78 @@
-# PAGO ? Process-Aware Governance Overlay (MVP Profissional)
+# PAGO ‚Äî Process-Aware Governance Overlay (MVP Profissional)
 
-POC de um **GPS de Processo n„o intrusivo** para ERP legado: uma extens„o Chromium (Manifest V3) que lÍ contexto via DOM, exibe um mini-mapa BPMN e aplica guardrails operacionais para reduzir erro humano.
+POC de um **GPS de Processo n√£o intrusivo** para ERP legado: uma extens√£o Chromium (Manifest V3) que l√™ contexto via DOM, exibe um mini-mapa BPMN e aplica guardrails operacionais para reduzir erro humano.
 
-## Vis„o da POC
+## Vis√£o da POC
 
-Processo modelado (Emiss„o de Diploma):
+Processo modelado (Emiss√£o de Diploma):
 
-**InÌcio ? Revis„o AcadÍmica ? Check de Biblioteca ? Emiss„o Autorizada**
+**In√≠cio ‚Üí Revis√£o Acad√™mica ‚Üí Check de Biblioteca ‚Üí Emiss√£o Autorizada**
 
-Regra de governanÁa implementada:
+Regra de governan√ßa implementada:
 
-- O bot„o **Emitir Diploma Oficial** fica bloqueado enquanto o status do aluno for diferente de **Emiss„o Autorizada**.
+- O bot√£o **Emitir Diploma Oficial** fica bloqueado enquanto o status do aluno for diferente de **Emiss√£o Autorizada**.
 
 ## Estrutura do projeto
 
 ```
 PAGO/
-??? mock-erp.html
-??? pago-extension/
-    ??? manifest.json
-    ??? content.js
+‚îú‚îÄ‚îÄ mock-erp.html
+‚îî‚îÄ‚îÄ pago-extension/
+    ‚îú‚îÄ‚îÄ manifest.json
+    ‚îî‚îÄ‚îÄ content.js
 ```
 
 ## Componentes
 
 ### 1) Mock ERP (`mock-erp.html`)
 
-Ambiente de teste em arquivo ˙nico com estilo SaaS (Tailwind via CDN):
+Ambiente de teste em arquivo √∫nico com estilo SaaS (Tailwind via CDN):
 
 - Sidebar azul escuro
 - Topbar branca com busca
-- ¡rea de conte˙do cinza claro
+- √Årea de conte√∫do cinza claro
 - Card de perfil do aluno
 - `#pago-student-id` com valor `#2024-8831`
-- `#pago-workflow-status` (badge din‚mico)
+- `#pago-workflow-status` (badge din√¢mico)
 - `#pago-status-simulator` (select para simular etapas)
-- `#pago-btn-action` (bot„o de emiss„o)
+- `#pago-btn-action` (bot√£o de emiss√£o)
 
-### 2) Extens„o PAGO Core (`pago-extension`)
+### 2) Extens√£o PAGO Core (`pago-extension`)
 
-ImplementaÁ„o Manifest V3 com `content_script`:
+Implementa√ß√£o Manifest V3 com `content_script`:
 
-- InjeÁ„o de overlay via **Shadow DOM** (evita conflito de CSS com o ERP)
+- Inje√ß√£o de overlay via **Shadow DOM** (evita conflito de CSS com o ERP)
 - FAB flutuante no canto inferior direito
-- Painel transl˙cido com BPMN usando **bpmn-js (viewer mode)**
+- Painel transl√∫cido com BPMN usando **bpmn-js (viewer mode)**
 - `MutationObserver` no `#pago-workflow-status`
 - Destaque no diagrama com `canvas.addMarker`
 - Guardrail operacional no `#pago-btn-action`
 
-## LÛgica de sincronizaÁ„o DOM ? BPMN
+## L√≥gica de sincroniza√ß√£o DOM ‚Üí BPMN
 
-- `Revis„o AcadÍmica` ? destaca `Task_Academic` (azul)
-- `Check de Biblioteca` ? destaca `Task_Library` (azul)
-- `Emiss„o Autorizada` ? destaca `Task_Final` (verde)
+- `Revis√£o Acad√™mica` ‚Üí destaca `Task_Academic` (azul)
+- `Check de Biblioteca` ‚Üí destaca `Task_Library` (azul)
+- `Emiss√£o Autorizada` ‚Üí destaca `Task_Final` (verde)
 
 ## Guardrail de conformidade
 
-Quando status **!= Emiss„o Autorizada**:
+Quando status **!= Emiss√£o Autorizada**:
 
 - `pointer-events: none`
 - `opacity: 0.5`
-- aviso injetado: **Bloqueado pelo PAGO: PendÍncias detectadas**
+- aviso injetado: **Bloqueado pelo PAGO: Pend√™ncias detectadas**
 
-Quando status **== Emiss„o Autorizada**:
+Quando status **== Emiss√£o Autorizada**:
 
-- bot„o reabilitado visual e funcionalmente
+- bot√£o reabilitado visual e funcionalmente
 - aviso ocultado
 
 ## Como executar
 
-### PrÈ-requisitos
+### Pr√©-requisitos
 
 - Chromium/Google Chrome
-- Python 3 (ou qualquer servidor est·tico)
+- Python 3 (ou qualquer servidor est√°tico)
 
 ### 1) Subir servidor local
 
@@ -86,11 +86,11 @@ Abrir no navegador:
 
 `http://localhost:8080/mock-erp.html`
 
-### 2) Carregar a extens„o
+### 2) Carregar a extens√£o
 
 1. Acesse `chrome://extensions`
 2. Ative **Modo do desenvolvedor**
-3. Clique em **Carregar sem compactaÁ„o**
+3. Clique em **Carregar sem compacta√ß√£o**
 4. Selecione a pasta `pago-extension`
 
 ## Como validar a demo
@@ -98,23 +98,23 @@ Abrir no navegador:
 1. Abra o mock ERP.
 2. Clique no FAB **PAGO** (canto inferior direito) para expandir o painel BPMN.
 3. Troque o status no seletor:
-   - `Revis„o AcadÍmica`
+   - `Revis√£o Acad√™mica`
    - `Check de Biblioteca`
-   - `Emiss„o Autorizada`
-4. Observe o destaque do nÛ correspondente no diagrama.
-5. Verifique o guardrail no bot„o de emiss„o:
+   - `Emiss√£o Autorizada`
+4. Observe o destaque do n√≥ correspondente no diagrama.
+5. Verifique o guardrail no bot√£o de emiss√£o:
    - bloqueado nas duas primeiras etapas
-   - liberado em `Emiss„o Autorizada`
+   - liberado em `Emiss√£o Autorizada`
 
-## DefiniÁ„o de pronto (DoP)
+## Defini√ß√£o de pronto (DoP)
 
 - [x] Mock ERP com visual profissional e contexto administrativo
-- [x] Overlay da extens„o isolado por Shadow DOM
+- [x] Overlay da extens√£o isolado por Shadow DOM
 - [x] Mini-mapa BPMN sincronizado em tempo real com o status DOM
-- [x] Bloqueio elegante da aÁ„o de emiss„o quando fora da etapa permitida
+- [x] Bloqueio elegante da a√ß√£o de emiss√£o quando fora da etapa permitida
 
-## ObservaÁıes tÈcnicas
+## Observa√ß√µes t√©cnicas
 
 - O `manifest.json` permite `localhost`, `127.0.0.1` e `file://` para facilitar testes.
-- O `bpmn-js` È carregado por CDN (`unpkg`) no `content.js`.
-- Para ambientes sem internet, È possÌvel substituir por bundle local de `bpmn-js`.
+- O `bpmn-js` √© carregado por CDN (`unpkg`) no `content.js`.
+- Para ambientes sem internet, √© poss√≠vel substituir por bundle local de `bpmn-js`.

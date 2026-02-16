@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ModernAdmin ERP - Emiss„o de Diploma</title>
+    <title>ModernAdmin ERP - Emiss√£o de Diploma</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       .badge-status {
@@ -41,13 +41,14 @@
     </style>
   </head>
   <body class="bg-slate-100 text-slate-800 antialiased">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <div class="min-h-screen flex">
       <aside class="w-72 bg-blue-950 text-blue-100 p-6 flex flex-col">
         <div class="flex items-center gap-3 mb-10">
           <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center font-bold">MA</div>
           <div>
             <h1 class="text-lg font-semibold">ModernAdmin</h1>
-            <p class="text-xs text-blue-300">ERP AcadÍmico</p>
+            <p class="text-xs text-blue-300">ERP Acad√™mico</p>
           </div>
         </div>
 
@@ -61,20 +62,20 @@
 
         <div class="mt-auto text-xs text-blue-300">
           <p>Ambiente de Teste PAGO</p>
-          <p>Vers„o 2026.1</p>
+          <p>Vers√£o 2026.1</p>
         </div>
       </aside>
 
       <main class="flex-1 flex flex-col">
         <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-semibold text-slate-900">Gest„o de Emiss„o de Diploma</h2>
-            <p class="text-sm text-slate-500">Fluxo institucional com validaÁıes de conformidade</p>
+            <h2 class="text-xl font-semibold text-slate-900">Gest√£o de Emiss√£o de Diploma</h2>
+            <p class="text-sm text-slate-500">Fluxo institucional com valida√ß√µes de conformidade</p>
           </div>
           <div class="w-80">
             <input
               type="text"
-              placeholder="Buscar aluno, matrÌcula, curso..."
+              placeholder="Buscar aluno, matr√≠cula, curso..."
               class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -96,8 +97,8 @@
             <div class="grid md:grid-cols-2 gap-6">
               <div class="space-y-3">
                 <p class="text-sm font-medium text-slate-700">Status do Workflow</p>
-                <div id="pago-workflow-status" class="badge-status status-review">Revis„o AcadÍmica</div>
-                <p class="text-xs text-slate-500">A extens„o PAGO monitora este campo para sincronizar o mapa BPMN.</p>
+                <div id="pago-workflow-status" class="badge-status status-review">Revis√£o Acad√™mica</div>
+                <p class="text-xs text-slate-500">A extens√£o PAGO monitora este campo para sincronizar o mapa BPMN.</p>
               </div>
 
               <div class="space-y-3">
@@ -106,9 +107,9 @@
                   id="pago-status-simulator"
                   class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="Revis„o AcadÍmica" selected>Revis„o AcadÍmica</option>
+                  <option value="Revis√£o Acad√™mica" selected>Revis√£o Acad√™mica</option>
                   <option value="Check de Biblioteca">Check de Biblioteca</option>
-                  <option value="Emiss„o Autorizada">Emiss„o Autorizada</option>
+                  <option value="Emiss√£o Autorizada">Emiss√£o Autorizada</option>
                 </select>
               </div>
             </div>
@@ -127,9 +128,9 @@
         const statusSelect = document.getElementById('pago-status-simulator');
 
         const statusClassMap = {
-          'Revis„o AcadÍmica': 'status-review',
+          'Revis√£o Acad√™mica': 'status-review',
           'Check de Biblioteca': 'status-library',
-          'Emiss„o Autorizada': 'status-approved',
+          'Emiss√£o Autorizada': 'status-approved',
         };
 
         function updateStatusView(newStatus) {
