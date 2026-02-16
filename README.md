@@ -18,8 +18,12 @@ Regra de governança implementada:
 PAGO/
 ├── mock-erp.html
 └── pago-extension/
+   ├── icons/
+   ├── lib/
+   │   └── bpmn-viewer.development.js
     ├── manifest.json
-    └── content.js
+   ├── content.js
+   └── package.json
 ```
 
 ## Componentes
@@ -42,11 +46,13 @@ Ambiente de teste em arquivo único com estilo SaaS (Tailwind via CDN):
 Implementação Manifest V3 com `content_script`:
 
 - Injeção de overlay via **Shadow DOM** (evita conflito de CSS com o ERP)
+- Ícone da extensão na toolbar do Chrome (`action.default_icon`)
 - FAB flutuante no canto inferior direito
-- Painel translúcido com BPMN usando **bpmn-js (viewer mode)**
+- Painel translúcido com BPMN usando **bpmn-js (viewer mode)** local (`lib/bpmn-viewer.development.js`)
 - `MutationObserver` no `#pago-workflow-status`
 - Destaque no diagrama com `canvas.addMarker`
 - Guardrail operacional no `#pago-btn-action`
+- Modo de contingência visual quando o viewer BPMN não estiver disponível
 
 ## Lógica de sincronização DOM → BPMN
 
@@ -73,6 +79,7 @@ Quando status **== Emissão Autorizada**:
 
 - Chromium/Google Chrome
 - Python 3 (ou qualquer servidor estático)
+- Node.js + npm (apenas para atualizar dependências da extensão)
 
 ### 1) Subir servidor local
 
@@ -92,6 +99,17 @@ Abrir no navegador:
 2. Ative **Modo do desenvolvedor**
 3. Clique em **Carregar sem compactação**
 4. Selecione a pasta `pago-extension`
+
+### 3) (Opcional) Atualizar o bundle local do BPMN
+
+Use este passo somente se quiser trocar/atualizar a versão do `bpmn-js`:
+
+```bash
+cd pago-extension
+npm install bpmn-js@17.11.1
+mkdir -p lib
+cp node_modules/bpmn-js/dist/bpmn-viewer.development.js lib/bpmn-viewer.development.js
+```
 
 ## Como validar a demo
 
@@ -116,5 +134,6 @@ Abrir no navegador:
 ## Observações técnicas
 
 - O `manifest.json` permite `localhost`, `127.0.0.1` e `file://` para facilitar testes.
-- O `bpmn-js` é carregado por CDN (`unpkg`) no `content.js`.
-- Para ambientes sem internet, é possível substituir por bundle local de `bpmn-js`.
+- O `bpmn-js` é carregado localmente pela extensão em `lib/bpmn-viewer.development.js`.
+- Essa abordagem evita erros de CSP no Chrome MV3 causados por scripts remotos.
+- Após qualquer alteração em `manifest.json` ou `content.js`, recarregue a extensão em `chrome://extensions`.
