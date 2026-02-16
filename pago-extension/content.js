@@ -4,7 +4,10 @@
   }
   window.__PAGO_CORE_LOADED__ = true;
 
-  const BPMN_LIBRARY_URL = 'https://unpkg.com/bpmn-js@17.11.1/dist/bpmn-viewer.development.js';
+  const BPMN_LIBRARY_URLS = [
+    'https://unpkg.com/bpmn-js@17.11.1/dist/bpmn-viewer.development.js',
+    'https://cdn.jsdelivr.net/npm/bpmn-js@17.11.1/dist/bpmn-viewer.development.js',
+  ];
   const STATUS_ELEMENT_ID = 'pago-workflow-status';
   const ACTION_BUTTON_ID = 'pago-btn-action';
   const GOVERNANCE_HINT_ID = 'pago-governance-hint';
@@ -81,6 +84,7 @@
     panelOpen: false,
     bpmnViewer: null,
     canvas: null,
+    fallbackMode: false,
   };
 
   function createOverlay() {
@@ -159,6 +163,60 @@
           flex: 1;
           background: rgba(255, 255, 255, 0.95);
         }
+        .pago-fallback-map {
+          height: 100%;
+          padding: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          color: #0f172a;
+          font-size: 12px;
+        }
+        .pago-fallback-node {
+          min-width: 110px;
+          text-align: center;
+          border: 1px solid #cbd5e1;
+          border-radius: 10px;
+          padding: 10px 8px;
+          background: #ffffff;
+          color: #334155;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+        .pago-fallback-node.start {
+          min-width: 70px;
+          border-radius: 999px;
+        }
+        .pago-fallback-arrow {
+          color: #64748b;
+          font-size: 16px;
+          font-weight: 700;
+        }
+        .pago-fallback-node.active-blue {
+          border-color: #2563eb;
+          background: #dbeafe;
+          color: #1d4ed8;
+          box-shadow: 0 0 0 1px #2563eb inset;
+        }
+        .pago-fallback-node.active-green {
+          border-color: #16a34a;
+          background: #dcfce7;
+          color: #166534;
+          box-shadow: 0 0 0 1px #16a34a inset;
+        }
+        .pago-fallback-note {
+          position: absolute;
+          right: 12px;
+          top: 52px;
+          border: 1px solid #fde68a;
+          background: #fffbeb;
+          color: #92400e;
+          border-radius: 999px;
+          font-size: 11px;
+          font-weight: 600;
+          padding: 4px 8px;
+        }
         .djs-container .pago-marker-blue .djs-visual > :nth-child(1) {
           stroke: #2563eb !important;
           stroke-width: 3px !important;
@@ -173,7 +231,7 @@
       <div class="pago-root">
         <div id="pago-panel" class="pago-panel" aria-label="Mapa de processo PAGO">
           <div class="pago-panel-header">
-            <strong>PAGO ? GPS de Processo</strong>
+            <strong>PAGO • GPS de Processo</strong>
             <span id="pago-current-stage" class="pago-stage">Revisão Acadêmica</span>
           </div>
           <div id="pago-bpmn-container" class="pago-bpmn-container"></div>
@@ -191,22 +249,10 @@
     };
   }
 
-  function loadBpmnLibrary() {
+  function loadScript(url) {
     return new Promise((resolve, reject) => {
-      if (window.BpmnJS) {
-        resolve(window.BpmnJS);
-        return;
-      }
-
-      const existing = document.querySelector('script[data-pago-bpmn="true"]');
-      if (existing) {
-        existing.addEventListener('load', () => resolve(window.BpmnJS));
-        existing.addEventListener('error', () => reject(new Error('Falha ao carregar bpmn-js')));
-        return;
-      }
-
       const script = document.createElement('script');
-      script.src = BPMN_LIBRARY_URL;
+      script.src = url;
       script.async = true;
       script.dataset.pagoBpmn = 'true';
       script.addEventListener('load', () => {
@@ -214,11 +260,65 @@
           resolve(window.BpmnJS);
           return;
         }
-        reject(new Error('bpmn-js indisponível após o carregamento'));
+        reject(new Error('bpmn-js indisponível após carregamento do script'));
       });
-      script.addEventListener('error', () => reject(new Error('Não foi possível baixar bpmn-js via CDN')));
+      script.addEventListener('error', () => reject(new Error(`Falha de rede em ${url}`)));
       document.documentElement.appendChild(script);
     });
+  }
+
+  async function loadBpmnLibrary() {
+    if (window.BpmnJS) {
+      return window.BpmnJS;
+    }
+
+    const errors = [];
+    for (const url of BPMN_LIBRARY_URLS) {
+      try {
+        return await loadScript(url);
+      } catch (error) {
+        errors.push(error.message);
+      }
+    }
+
+    throw new Error(`Não foi possível carregar o bpmn-js (${errors.join(' | ')})`);
+  }
+
+  function renderFallbackMap(overlay) {
+    state.fallbackMode = true;
+    overlay.diagramContainer.innerHTML = `
+      <div class="pago-fallback-note">Modo de contingência</div>
+      <div class="pago-fallback-map">
+        <div class="pago-fallback-node start" data-node-id="StartEvent_Begin">Início</div>
+        <div class="pago-fallback-arrow">→</div>
+        <div class="pago-fallback-node" data-node-id="Task_Academic">Revisão Acadêmica</div>
+        <div class="pago-fallback-arrow">→</div>
+        <div class="pago-fallback-node" data-node-id="Task_Library">Check de Biblioteca</div>
+        <div class="pago-fallback-arrow">→</div>
+        <div class="pago-fallback-node" data-node-id="Task_Final">Emissão Autorizada</div>
+      </div>
+    `;
+  }
+
+  function syncFallbackHighlight(statusText, overlay) {
+    const nodes = overlay.diagramContainer.querySelectorAll('.pago-fallback-node');
+    nodes.forEach((node) => {
+      node.classList.remove('active-blue', 'active-green');
+    });
+
+    const nodeId = STAGE_NODE_MAP[statusText];
+    const marker = HIGHLIGHT_CLASS_MAP[statusText];
+    const activeNode = nodeId
+      ? overlay.diagramContainer.querySelector(`.pago-fallback-node[data-node-id="${nodeId}"]`)
+      : null;
+
+    if (activeNode && marker === 'pago-marker-green') {
+      activeNode.classList.add('active-green');
+    } else if (activeNode) {
+      activeNode.classList.add('active-blue');
+    }
+
+    overlay.stageLabel.textContent = statusText || 'Status desconhecido';
   }
 
   async function initializeBpmn(overlay) {
@@ -226,14 +326,20 @@
       return;
     }
 
-    const BpmnJS = await loadBpmnLibrary();
-    state.bpmnViewer = new BpmnJS({
-      container: overlay.diagramContainer,
-    });
+    try {
+      const BpmnJS = await loadBpmnLibrary();
+      state.bpmnViewer = new BpmnJS({
+        container: overlay.diagramContainer,
+      });
 
-    await state.bpmnViewer.importXML(BPMN_XML);
-    state.canvas = state.bpmnViewer.get('canvas');
-    state.canvas.zoom('fit-viewport');
+      await state.bpmnViewer.importXML(BPMN_XML);
+      state.canvas = state.bpmnViewer.get('canvas');
+      state.canvas.zoom('fit-viewport');
+      state.fallbackMode = false;
+    } catch (error) {
+      console.warn('[PAGO] bpmn-js indisponível. Ativando modo de contingência.', error);
+      renderFallbackMap(overlay);
+    }
   }
 
   function removeAllMarkers() {
@@ -347,13 +453,14 @@
       overlay.fab.setAttribute('aria-expanded', String(state.panelOpen));
 
       if (state.panelOpen && !state.bpmnViewer) {
-        try {
+        if (!state.fallbackMode) {
           await initializeBpmn(overlay);
+        }
+
+        if (state.bpmnViewer) {
           syncBpmnHighlight(getCurrentStatusText(), overlay);
-        } catch (error) {
-          overlay.stageLabel.textContent = 'Erro ao carregar mapa BPMN';
-          overlay.diagramContainer.innerHTML = '<div style="padding:16px;color:#b91c1c;font-size:13px;">Falha ao carregar o visualizador BPMN.</div>';
-          console.error('[PAGO] Erro ao iniciar bpmn-js:', error);
+        } else if (state.fallbackMode) {
+          syncFallbackHighlight(getCurrentStatusText(), overlay);
         }
       }
     });
@@ -362,6 +469,8 @@
       applyGuardrail(statusText);
       if (state.bpmnViewer) {
         syncBpmnHighlight(statusText, overlay);
+      } else if (state.fallbackMode) {
+        syncFallbackHighlight(statusText, overlay);
       } else {
         overlay.stageLabel.textContent = statusText || 'Status desconhecido';
       }
