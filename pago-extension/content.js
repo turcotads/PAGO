@@ -4,10 +4,6 @@
   }
   window.__PAGO_CORE_LOADED__ = true;
 
-  const BPMN_LIBRARY_URLS = [
-    'https://unpkg.com/bpmn-js@17.11.1/dist/bpmn-viewer.development.js',
-    'https://cdn.jsdelivr.net/npm/bpmn-js@17.11.1/dist/bpmn-viewer.development.js',
-  ];
   const STATUS_ELEMENT_ID = 'pago-workflow-status';
   const ACTION_BUTTON_ID = 'pago-btn-action';
   const GOVERNANCE_HINT_ID = 'pago-governance-hint';
@@ -249,39 +245,12 @@
     };
   }
 
-  function loadScript(url) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = url;
-      script.async = true;
-      script.dataset.pagoBpmn = 'true';
-      script.addEventListener('load', () => {
-        if (window.BpmnJS) {
-          resolve(window.BpmnJS);
-          return;
-        }
-        reject(new Error('bpmn-js indisponível após carregamento do script'));
-      });
-      script.addEventListener('error', () => reject(new Error(`Falha de rede em ${url}`)));
-      document.documentElement.appendChild(script);
-    });
-  }
-
   async function loadBpmnLibrary() {
     if (window.BpmnJS) {
       return window.BpmnJS;
     }
 
-    const errors = [];
-    for (const url of BPMN_LIBRARY_URLS) {
-      try {
-        return await loadScript(url);
-      } catch (error) {
-        errors.push(error.message);
-      }
-    }
-
-    throw new Error(`Não foi possível carregar o bpmn-js (${errors.join(' | ')})`);
+    throw new Error('bpmn-js não carregado. Verifique se lib/bpmn-viewer.development.js está incluído no manifest.');
   }
 
   function renderFallbackMap(overlay) {
