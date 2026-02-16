@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "PAGO Core",
+  "description": "Process-Aware Governance Overlay para sistemas administrativos legados.",
+  "version": "0.1.0",
+  "permissions": ["scripting"],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "file:///*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://localhost/*", "http://127.0.0.1/*", "file:///*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

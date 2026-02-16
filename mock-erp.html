@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ModernAdmin ERP - Emissão de Diploma</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .badge-status {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        font-weight: 600;
+        padding: 0.375rem 0.875rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+      }
+      .status-review {
+        background-color: #dbeafe;
+        color: #1d4ed8;
+      }
+      .status-library {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+      .status-approved {
+        background-color: #dcfce7;
+        color: #166534;
+      }
+      .btn-primary {
+        background-color: #2563eb;
+        color: #ffffff;
+        border-radius: 0.75rem;
+        padding: 0.7rem 1.2rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+      .btn-primary:hover {
+        background-color: #1d4ed8;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-100 text-slate-800 antialiased">
+    <div class="min-h-screen flex">
+      <aside class="w-72 bg-blue-950 text-blue-100 p-6 flex flex-col">
+        <div class="flex items-center gap-3 mb-10">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center font-bold">MA</div>
+          <div>
+            <h1 class="text-lg font-semibold">ModernAdmin</h1>
+            <p class="text-xs text-blue-300">ERP Acadêmico</p>
+          </div>
+        </div>
+
+        <nav class="space-y-2 text-sm">
+          <a href="#" class="block px-3 py-2 rounded-lg bg-blue-900/80">Painel</a>
+          <a href="#" class="block px-3 py-2 rounded-lg hover:bg-blue-900/60">Alunos</a>
+          <a href="#" class="block px-3 py-2 rounded-lg hover:bg-blue-900/60">Biblioteca</a>
+          <a href="#" class="block px-3 py-2 rounded-lg hover:bg-blue-900/60">Diplomas</a>
+          <a href="#" class="block px-3 py-2 rounded-lg hover:bg-blue-900/60">Auditoria</a>
+        </nav>
+
+        <div class="mt-auto text-xs text-blue-300">
+          <p>Ambiente de Teste PAGO</p>
+          <p>Versão 2026.1</p>
+        </div>
+      </aside>
+
+      <main class="flex-1 flex flex-col">
+        <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-semibold text-slate-900">Gestão de Emissão de Diploma</h2>
+            <p class="text-sm text-slate-500">Fluxo institucional com validações de conformidade</p>
+          </div>
+          <div class="w-80">
+            <input
+              type="text"
+              placeholder="Buscar aluno, matrícula, curso..."
+              class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </header>
+
+        <section class="p-8">
+          <div class="max-w-3xl bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-7">
+            <div class="flex items-start justify-between gap-6">
+              <div>
+                <p class="text-sm text-slate-500">Perfil do Aluno</p>
+                <h3 class="text-2xl font-semibold text-slate-900 mt-1">Fabio Martins</h3>
+                <p class="text-sm text-slate-600 mt-2">
+                  Identificador: <span id="pago-student-id" class="font-semibold text-slate-800">#2024-8831</span>
+                </p>
+              </div>
+              <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Aluno Concluinte</span>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-3">
+                <p class="text-sm font-medium text-slate-700">Status do Workflow</p>
+                <div id="pago-workflow-status" class="badge-status status-review">Revisão Acadêmica</div>
+                <p class="text-xs text-slate-500">A extensão PAGO monitora este campo para sincronizar o mapa BPMN.</p>
+              </div>
+
+              <div class="space-y-3">
+                <p class="text-sm font-medium text-slate-700">Painel de Controle (Simulador)</p>
+                <select
+                  id="pago-status-simulator"
+                  class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Revisão Acadêmica" selected>Revisão Acadêmica</option>
+                  <option value="Check de Biblioteca">Check de Biblioteca</option>
+                  <option value="Emissão Autorizada">Emissão Autorizada</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-200">
+              <button id="pago-btn-action" class="btn-primary">Emitir Diploma Oficial</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        const statusElement = document.getElementById('pago-workflow-status');
+        const statusSelect = document.getElementById('pago-status-simulator');
+
+        const statusClassMap = {
+          'Revisão Acadêmica': 'status-review',
+          'Check de Biblioteca': 'status-library',
+          'Emissão Autorizada': 'status-approved',
+        };
+
+        function updateStatusView(newStatus) {
+          statusElement.textContent = newStatus;
+          statusElement.classList.remove('status-review', 'status-library', 'status-approved');
+          statusElement.classList.add(statusClassMap[newStatus] || 'status-review');
+        }
+
+        statusSelect.addEventListener('change', function (event) {
+          updateStatusView(event.target.value);
+        });
+
+        updateStatusView(statusSelect.value);
+      })();
+    </script>
+  </body>
+</html>
